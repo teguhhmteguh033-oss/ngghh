@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Kirim Pulsa Gratis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet" />
+    <style>
+        /* RESET */
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0f;
+        }
+
+        /* Container utama - menempati seluruh layar */
+        .app-wrapper {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0a0a0f;
+            background-image: radial-gradient(ellipse at 30% 20%, rgba(120,40,200,0.15) 0%, transparent 60%),
+                              radial-gradient(ellipse at 70% 80%, rgba(80,20,160,0.20) 0%, transparent 60%);
+            padding: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* CARD - tetap di tengah, tapi akan tertutup video saat muncul */
+        .card {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(18,16,28,0.85);
+            backdrop-filter: blur(24px) saturate(1.4);
+            -webkit-backdrop-filter: blur(24px) saturate(1.4);
+            border-radius: 40px;
+            padding: 32px 28px 36px;
+            border: 1px solid rgba(180,100,255,0.15);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(160,80,255,0.08) inset;
+            position: relative;
+            z-index: 10;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            border-radius: 42px;
+            background: linear-gradient(135deg, rgba(160,60,255,0.25), rgba(80,20,180,0.05), rgba(160,60,255,0.15));
+            z-index: -1;
+            filter: blur(8px);
+        }
+
+        .header { text-align:center; margin-bottom:28px; }
+        .header .icon-wrap {
+            display:inline-flex; align-items:center; justify-content:center;
+            width:68px; height:68px; border-radius:50%;
+            background: linear-gradient(145deg, rgba(140,60,255,0.25), rgba(80,20,180,0.15));
+            border:1px solid rgba(180,100,255,0.20);
+            margin-bottom:12px;
+            box-shadow:0 0 40px rgba(140,60,255,0.15);
+        }
+        .header .icon-wrap i { font-size:32px; color:#c08aff; filter:drop-shadow(0 0 12px rgba(160,80,255,0.4)); }
+        .header h1 {
+            font-size:26px; font-weight:700; letter-spacing:-0.5px;
+            background: linear-gradient(135deg, #e8d0ff, #b080ff);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .header p { color:rgba(200,180,230,0.6); font-size:14px; margin-top:4px; }
+
+        .form-group { margin-bottom:18px; }
+        .form-group label {
+            display:block; font-size:11px; font-weight:500; color:rgba(210,190,240,0.7);
+            margin-bottom:6px; letter-spacing:0.3px; text-transform:uppercase;
+        }
+        .form-group label i { margin-right:6px; color:rgba(160,100,255,0.6); }
+        .input-wrap {
+            display:flex; align-items:center; background:rgba(255,255,255,0.04);
+            border-radius:16px; border:1px solid rgba(180,120,255,0.10);
+            transition:all 0.3s; overflow:hidden;
+        }
+        .input-wrap:focus-within {
+            border-color:rgba(160,100,255,0.40);
+            box-shadow:0 0 0 4px rgba(140,60,255,0.08), 0 0 30px rgba(140,60,255,0.03);
+            background:rgba(255,255,255,0.06);
+        }
+        .input-wrap .prefix { padding:0 0 0 16px; color:rgba(200,180,230,0.3); font-weight:500; font-size:14px; user-select:none; }
+        .input-wrap input, .input-wrap select {
+            width:100%; padding:14px 16px; background:transparent; border:none; outline:none;
+            color:#f0e8ff; font-size:15px; font-weight:500; font-family:'Inter',sans-serif;
+        }
+        .input-wrap input::placeholder { color:rgba(200,180,230,0.25); font-weight:400; }
+        .input-wrap select {
+            appearance:none; cursor:pointer;
+            background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a070dd' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat:no-repeat; background-position:right 16px center; padding-right:44px;
+            color:#f0e8ff;
+        }
+        .input-wrap select option { background:#1a1528; color:#f0e8ff; }
+
+        .gb-selector { display:flex; gap:10px; flex-wrap:wrap; }
+        .gb-option {
+            flex:1; min-width:52px; padding:10px 0; text-align:center;
+            background:rgba(255,255,255,0.03); border-radius:14px;
+            border:1px solid rgba(180,120,255,0.06);
+            color:rgba(200,180,230,0.4); font-weight:600; font-size:14px;
+            cursor:pointer; transition:all 0.25s; user-select:none;
+        }
+        .gb-option:hover { background:rgba(140,60,255,0.08); border-color:rgba(180,120,255,0.15); color:rgba(220,200,255,0.7); }
+        .gb-option.active {
+            background:linear-gradient(145deg, rgba(140,60,255,0.20), rgba(100,30,200,0.15));
+            border-color:rgba(160,100,255,0.30); color:#dcc0ff;
+            box-shadow:0 0 30px rgba(140,60,255,0.05);
+        }
+        .gb-option .gb-label { display:block; font-size:10px; font-weight:400; opacity:0.4; margin-top:2px; }
+        .gb-option.active .gb-label { opacity:0.7; }
+
+        .btn-kirim {
+            width:100%; padding:16px 20px; margin-top:8px; border:none; border-radius:18px;
+            background:linear-gradient(145deg, #8a40e8, #6a20c8);
+            color:#fff; font-size:17px; font-weight:700; font-family:'Inter',sans-serif;
+            cursor:pointer; transition:all 0.3s; position:relative; overflow:hidden;
+            box-shadow:0 6px 30px rgba(120,40,200,0.25);
+            display:flex; align-items:center; justify-content:center; gap:12px;
+        }
+        .btn-kirim:hover { transform:translateY(-2px); box-shadow:0 10px 40px rgba(120,40,200,0.35); background:linear-gradient(145deg,#9648f0,#7628d8); }
+        .btn-kirim:active { transform:scale(0.97); }
+        .btn-kirim:disabled { opacity:0.5; cursor:not-allowed; transform:none !important; box-shadow:0 4px 20px rgba(120,40,200,0.08); }
+        .btn-kirim i { font-size:18px; transition:transform 0.3s; }
+        .btn-kirim:hover i { transform:translateX(4px); }
+        .btn-kirim .ripple {
+            position:absolute; border-radius:50%; background:rgba(255,255,255,0.25);
+            transform:scale(0); animation:rippleAnim 0.6s ease-out forwards; pointer-events:none;
+        }
+        @keyframes rippleAnim { to { transform:scale(4); opacity:0; } }
+
+        /* LOADING OVERLAY - di dalam card */
+        .loading-overlay {
+            display:none;
+            position:absolute; inset:0; border-radius:40px;
+            background:rgba(10,8,20,0.92);
+            backdrop-filter:blur(12px);
+            -webkit-backdrop-filter:blur(12px);
+            flex-direction:column; align-items:center; justify-content:center;
+            padding:30px; z-index:20;
+            animation:fadeInOverlay 0.5s ease forwards;
+        }
+        .loading-overlay.show { display:flex; }
+        @keyframes fadeInOverlay { from { opacity:0; backdrop-filter:blur(0px); } to { opacity:1; backdrop-filter:blur(12px); } }
+
+        .spinner-container {
+            position:relative; width:90px; height:90px; margin-bottom:28px;
+        }
+        .spinner-ring {
+            position:absolute; inset:0; border-radius:50%;
+            border:3px solid transparent;
+            border-top-color:#b080ff; border-right-color:#7a3ad0;
+            animation:spinRing 1s cubic-bezier(0.6,0.0,0.4,1.0) infinite;
+        }
+        .spinner-ring:nth-child(2) { inset:10px; border-top-color:#d4a0ff; border-right-color:#9050e0; animation-duration:1.6s; animation-direction:reverse; }
+        .spinner-ring:nth-child(3) { inset:20px; border-top-color:#f0d0ff; border-right-color:#b070f0; animation-duration:2.2s; }
+        .spinner-center {
+            position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+            font-size:26px; font-weight:700; color:rgba(200,170,255,0.15);
+            animation:pulseCenter 1.8s ease-in-out infinite;
+        }
+        @keyframes spinRing { to { transform:rotate(360deg); } }
+        @keyframes pulseCenter { 0%,100% { transform:scale(1); opacity:0.3; } 50% { transform:scale(1.08); opacity:0.7; } }
+
+        .progress-wrap { width:100%; max-width:260px; margin-top:4px; }
+        .progress-bar { width:100%; height:4px; border-radius:4px; background:rgba(255,255,255,0.05); overflow:hidden; }
+        .progress-bar .fill {
+            height:100%; width:0%; border-radius:4px;
+            background:linear-gradient(90deg, #7a3ad0, #b080ff, #d4a0ff);
+            transition:width 0.1s linear; box-shadow:0 0 20px rgba(140,60,255,0.3);
+        }
+        .progress-text { display:flex; justify-content:space-between; margin-top:10px; color:rgba(200,180,230,0.3); font-size:12px; font-weight:500; }
+        .progress-text .percent { color:rgba(200,180,230,0.5); }
+        .loading-status { margin-top:18px; color:rgba(200,180,230,0.2); font-size:13px; letter-spacing:1px; animation:pulseStatus 1.2s ease-in-out infinite; text-align:center; }
+        @keyframes pulseStatus { 0%,100% { opacity:0.3; } 50% { opacity:0.8; } }
+
+        /* ==============================================================
+           VIDEO FULL LAYAR - menutupi seluruh viewport
+           ============================================================== */
+        .video-fullscreen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            background: #000;
+            overflow: hidden;
+            animation: videoZoomIn 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.2) forwards;
+        }
+        .video-fullscreen.show {
+            display: block;
+        }
+        @keyframes videoZoomIn {
+            0% { transform: scale(1.1); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .video-fullscreen video {
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover; /* memenuhi seluruh layar tanpa celah */
+            display: block;
+            background: #000;
+        }
+
+        /* Hilangkan SEMUA kontrol video */
+        .video-fullscreen video::-webkit-media-controls { display: none !important; }
+        .video-fullscreen video::-webkit-media-controls-enclosure { display: none !important; }
+        .video-fullscreen video::-webkit-media-controls-panel { display: none !important; }
+        .video-fullscreen video::-webkit-media-controls-play-button { display: none !important; }
+        .video-fullscreen video::-webkit-media-controls-start-playback-button { display: none !important; }
+        .video-fullscreen video::-webkit-media-controls-timeline { display: none !important; }
+        .video-fullscreen video::-webkit-media-controls-current-time-display { display: none !important; }
+        .video-fullscreen video::-webkit-media-controls-time-remaining-display { display: none !important; }
+        .video-fullscreen video::-webkit-media-controls-volume-slider { display: none !important; }
+        .video-fullscreen video::-webkit-media-controls-mute-button { display: none !important; }
+        .video-fullscreen video::-webkit-media-controls-fullscreen-button { display: none !important; }
+
+        /* TIDAK ADA TOMBOL EXIT */
+
+        @media (max-width:480px) {
+            .card { padding:24px 18px 28px; border-radius:28px; }
+            .header h1 { font-size:22px; }
+            .gb-option { min-width:44px; font-size:13px; padding:8px 0; }
+            .btn-kirim { font-size:15px; padding:14px 16px; }
+            .loading-overlay { border-radius:28px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-wrapper">
+
+    <!-- CARD -->
+    <div class="card" id="appCard">
+
+        <div class="header">
+            <div class="icon-wrap"><i class="fas fa-bolt"></i></div>
+            <h1>Kirim Pulsa Gratis</h1>
+            <p>isi data, tekan kirim, dan saksikan kejutannya</p>
+        </div>
+
+        <form id="pulsaForm" autocomplete="off">
+            <div class="form-group">
+                <label><i class="fas fa-phone"></i> Nomor HP</label>
+                <div class="input-wrap">
+                    <span class="prefix">+62</span>
+                    <input type="tel" id="phoneInput" placeholder="812 3456 7890" required />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-sim-card"></i> Operator</label>
+                <div class="input-wrap">
+                    <i class="fas fa-chevron-down input-icon" style="pointer-events:none;padding-right:0;"></i>
+                    <select id="operatorSelect" required>
+                        <option value="" disabled selected>Pilih operator</option>
+                        <option value="xl">XL Axiata</option>
+                        <option value="telkomsel">Telkomsel</option>
+                        <option value="indosat">Indosat Ooredoo</option>
+                        <option value="tri">Tri (3)</option>
+                        <option value="smartfren">Smartfren</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-database"></i> Pilih GB</label>
+                <div class="gb-selector" id="gbSelector">
+                    <div class="gb-option" data-gb="1">1 <span class="gb-label">GB</span></div>
+                    <div class="gb-option active" data-gb="3">3 <span class="gb-label">GB</span></div>
+                    <div class="gb-option" data-gb="5">5 <span class="gb-label">GB</span></div>
+                    <div class="gb-option" data-gb="10">10 <span class="gb-label">GB</span></div>
+                    <div class="gb-option" data-gb="25">25 <span class="gb-label">GB</span></div>
+                </div>
+                <input type="hidden" id="gbHidden" value="3" />
+            </div>
+
+            <button type="submit" class="btn-kirim" id="btnKirim">
+                <i class="fas fa-paper-plane"></i> Kirim Pulsa
+            </button>
+        </form>
+
+        <!-- LOADING -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="spinner-container">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-center">⚡</div>
+            </div>
+            <div class="progress-wrap">
+                <div class="progress-bar">
+                    <div class="fill" id="progressFill" style="width:0%;"></div>
+                </div>
+                <div class="progress-text">
+                    <span>Mengirim</span>
+                    <span class="percent" id="percentText">0%</span>
+                </div>
+            </div>
+            <div class="loading-status" id="loadingStatus">⏳ Menyambungkan ke server ...</div>
+        </div>
+    </div>
+
+    <!-- VIDEO FULL LAYAR -->
+    <div class="video-fullscreen" id="videoFullscreen">
+        <video id="prankVideo" autoplay playsinline loopdisablePictureInPicture>
+            <!-- ========================================================= -->
+            <!--  🔥  GANTI NAMA FILE VIDEO SESUAI DENGAN FILE KAMU        -->
+            <!--  Contoh: video prank.mp4, prank.mp4, dsb.                 -->
+            <!-- ========================================================= -->
+            <source src="prankvideos.mp4" type="video/mp4" />
+            Browser tidak mendukung video.
+        </video>
+        <!-- TIDAK ADA TOMBOL EXIT -->
+    </div>
+
+</div>
+
+<script>
+    (function() {
+        const form = document.getElementById('pulsaForm');
+        const phoneInput = document.getElementById('phoneInput');
+        const operatorSelect = document.getElementById('operatorSelect');
+        const gbOptions = document.querySelectorAll('.gb-option');
+        const gbHidden = document.getElementById('gbHidden');
+        const btnKirim = document.getElementById('btnKirim');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const progressFill = document.getElementById('progressFill');
+        const percentText = document.getElementById('percentText');
+        const loadingStatus = document.getElementById('loadingStatus');
+        const videoFullscreen = document.getElementById('videoFullscreen');
+        const prankVideo = document.getElementById('prankVideo');
+
+        // GB selector
+        gbOptions.forEach(opt => {
+            opt.addEventListener('click', function() {
+                gbOptions.forEach(o => o.classList.remove('active'));
+                this.classList.add('active');
+                gbHidden.value = this.dataset.gb;
+            });
+        });
+
+        // Ripple
+        function createRipple(e, btn) {
+            const rect = btn.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = (e.clientX || e.touches?.[0]?.clientX || rect.left + rect.width/2) - rect.left - size/2;
+            const y = (e.clientY || e.touches?.[0]?.clientY || rect.top + rect.height/2) - rect.top - size/2;
+            const ripple = document.createElement('span');
+            ripple.className = 'ripple';
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            btn.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 700);
+        }
+
+        // Submit
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const phone = phoneInput.value.trim();
+            const operator = operatorSelect.value;
+            if (!phone || phone.length < 6) {
+                phoneInput.style.borderColor = 'rgba(255,80,80,0.3)';
+                phoneInput.focus();
+                setTimeout(() => phoneInput.style.borderColor = '', 1200);
+                return;
+            }
+            if (!operator) {
+                operatorSelect.style.borderColor = 'rgba(255,80,80,0.3)';
+                setTimeout(() => operatorSelect.style.borderColor = '', 1200);
+                return;
+            }
+
+            createRipple(e, btnKirim);
+            btnKirim.disabled = true;
+            btnKirim.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses ...';
+
+            // Sembunyikan video jika terbuka
+            videoFullscreen.classList.remove('show');
+            videoFullscreen.style.display = 'none';
+            prankVideo.pause();
+
+            // Tampilkan loading
+            loadingOverlay.classList.add('show');
+
+            // Reload video agar fresh
+            const currentSrc = prankVideo.querySelector('source')?.src || prankVideo.src;
+            prankVideo.dataset.src = currentSrc;
+
+            let progress = 0;
+            const statusMessages = [
+                '⏳ Menyambungkan ke server ...',
+                '📡 Mengirim data ke satelit ...',
+                '🔄 Memproses permintaan ...',
+                '📦 Menyiapkan paket pulsa ...',
+                '⚡ Menyalurkan sinyal ...',
+                '✅ Hampir selesai!',
+            ];
+            let statusIdx = 0;
+            const statusInterval = setInterval(() => {
+                statusIdx = (statusIdx + 1) % statusMessages.length;
+                loadingStatus.textContent = statusMessages[statusIdx];
+            }, 600);
+
+            const progressInterval = setInterval(() => {
+                const remaining = 100 - progress;
+                const increment = Math.max(0.4, remaining * 0.045 + 0.2);
+                progress = Math.min(100, progress + increment);
+                progressFill.style.width = progress + '%';
+                percentText.textContent = Math.round(progress) + '%';
+
+                if (progress > 80) loadingStatus.textContent = '✨ Hampir sampai!';
+                else if (progress > 55) loadingStatus.textContent = '📦 Mengemas pulsa ...';
+                else if (progress > 30) loadingStatus.textContent = '🔄 Memproses transaksi ...';
+                else if (progress > 10) loadingStatus.textContent = '📡 Menghubungkan ...';
+
+                if (progress >= 100) {
+                    clearInterval(progressInterval);
+                    clearInterval(statusInterval);
+                    loadingStatus.textContent = '🎉 Pulsa berhasil dikirim!';
+
+                    setTimeout(() => {
+                        loadingOverlay.classList.remove('show');
+                        btnKirim.disabled = false;
+                        btnKirim.innerHTML = '<i class="fas fa-paper-plane"></i> Kirim Pulsa';
+
+                        // Set video source dari file lokal
+                        const src = prankVideo.dataset.src || prankVideo.src;
+                        if (src) {
+                            prankVideo.src = src;
+                            prankVideo.load();
+                        }
+                        // Tampilkan video FULL LAYAR
+                        videoFullscreen.style.display = 'block';
+                        void videoFullscreen.offsetWidth;
+                        videoFullscreen.classList.add('show');
+                        prankVideo.currentTime = 0;
+                        prankVideo.play().catch(() => {});
+                    }, 700);
+                }
+            }, 40);
+
+            // Safety fallback
+            setTimeout(() => {
+                if (progress < 100) {
+                    progress = 100;
+                    progressFill.style.width = '100%';
+                    percentText.textContent = '100%';
+                    clearInterval(progressInterval);
+                    clearInterval(statusInterval);
+                    loadingStatus.textContent = '🎉 Pulsa berhasil dikirim!';
+                    setTimeout(() => {
+                        loadingOverlay.classList.remove('show');
+                        btnKirim.disabled = false;
+                        btnKirim.innerHTML = '<i class="fas fa-paper-plane"></i> Kirim Pulsa';
+                        const src = prankVideo.dataset.src || prankVideo.src;
+                        if (src) { prankVideo.src = src; prankVideo.load(); }
+                        videoFullscreen.style.display = 'block';
+                        void videoFullscreen.offsetWidth;
+                        videoFullscreen.classList.add('show');
+                        prankVideo.currentTime = 0;
+                        prankVideo.play().catch(() => {});
+                    }, 500);
+                }
+            }, 8000);
+        });
+
+        console.log('💜✨ Pulsa Prank — video FULL LAYAR, loop, tanpa kontrol & exit!');
+    })();
+</script>
+
+</body>
+</html>
